@@ -5,13 +5,45 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from loader import db, bot
 from keyboards.inline.buttons import are_you_sure_markup
-from states.test import AdminState
+from states.test import AdminState,ClientState
 from filters.admin import IsBotAdminFilter
 from data.config import ADMINS
 from utils.pgtoexcel import export_to_excel
-
+from telethon_clients import disconnect_all_clients
+from telethon_clients import clients  # global clients dict
 router = Router()
 
+
+@router.message(Command('admin'), IsBotAdminFilter(ADMINS))
+async def admin_help(message: types.Message):
+    text = (
+        "🔐 <b>Admin Panel</b>\n\n"
+        "🔎 <b>/status</b> — Joriy faol Telethon mijozlar sonini ko‘rsatadi. "
+        "Agar xohlasangiz, ularni <i>disconnect</i> qilishingiz mumkin.\n\n"
+        "👥 <b>/allusers</b> — Barcha foydalanuvchilarning ro‘yxatini Excel fayl ko‘rinishida yuboradi.\n\n"
+        "📢 <b>/reklama</b> — Barcha foydalanuvchilarga xabar (post) yuborish uchun.\n\n"
+        "🧹 <b>/cleandb</b> — Ma'lumotlar bazasidagi barcha foydalanuvchilarni tozalash. "
+        "Foydalanishdan oldin tasdiqlash so‘raladi.\n\n"
+        "🛠 <b>/admin</b> — Ushbu yordamchi panelni ko‘rsatadi.\n"
+    )
+    await message.answer(text, parse_mode="HTML")
+
+@router.message(Command('status'), IsBotAdminFilter(ADMINS))
+async def users_status(message: types.Message, state: FSMContext):
+    count = len(clients)
+    await message.answer(f"📊 Hozirda {count} ta foydalanuvchi Telethon session holatda (active client).")
+    await message.reply("Clients disconnected qilamizmi ? ",reply_markup=are_you_sure_markup)
+    await state.set_state(ClientState.waiting_delete_confirm)
+
+@router.callback_query(ClientState.waiting_delete_confirm, IsBotAdminFilter(ADMINS))
+async def disconnect_all(call: types.CallbackQuery, state: FSMContext):
+    action = call.data
+    if action == 'yes':
+        await call.message.edit_text("✅ Clients disconnect qilindi.")
+        await disconnect_all_clients()
+    else:
+        await call.message.edit_text("🚫 Amal bekor qilindi. Clients saqlab qolindi.")
+    await state.clear()
 
 @router.message(Command('allusers'), IsBotAdminFilter(ADMINS))
 async def get_all_users(message: types.Message):
@@ -21,7 +53,6 @@ async def get_all_users(message: types.Message):
     await export_to_excel(data=users, headings=['ID', 'Full Name', 'Username', 'Telegram ID'], filepath=file_path)
 
     await message.answer_document(types.input_file.FSInputFile(file_path))
-
 
 @router.message(Command('reklama'), IsBotAdminFilter(ADMINS))
 async def ask_ad_content(message: types.Message, state: FSMContext):
@@ -63,3 +94,5 @@ async def clean_db(call: types.CallbackQuery, state: FSMContext):
         text = "Bekor qilindi."
     await bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=msg_id)
     await state.clear()
+
+

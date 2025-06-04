@@ -15,3 +15,6 @@ class LoginState(StatesGroup):
     waiting_confirm_code = State()
     code_input = State()
     two_factor_password = State()
+
+class ClientState(StatesGroup):
+    waiting_delete_confirm = State()

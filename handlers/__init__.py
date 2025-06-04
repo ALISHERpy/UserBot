@@ -5,7 +5,7 @@ from filters import ChatTypeFilter
 
 
 def setup_routers() -> Router:
-    from .users import admin, start, help, loginold,login
+    from .users import admin, start, help,login
     from .errors import error_handler
 
     router = Router()
