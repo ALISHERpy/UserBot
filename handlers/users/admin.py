@@ -13,7 +13,6 @@ from telethon_clients import disconnect_all_clients
 from telethon_clients import clients  # global clients dict
 router = Router()
 
-
 @router.message(Command('admin'), IsBotAdminFilter(ADMINS))
 async def admin_help(message: types.Message):
     text = (

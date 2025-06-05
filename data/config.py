@@ -16,3 +16,7 @@ DB_HOST = env.str("DB_HOST")
 DB_PORT = env.str("DB_PORT")
 
 BACKEND_HOST = env.str("BACKEND_HOST", "http://localhost:8000")
+
+
+API_ID = env.str("api_id")
+API_HASH = env.str("api_hash")

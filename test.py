@@ -1,9 +1,6 @@
 # from telethon import TelegramClient, events
 # import os
 #
-# api_id = 23781985
-# api_hash = '02d6562dd390823f0b0cd404ecc1e268'
-#
 # client = TelegramClient('anon', api_id, api_hash)
 #
 # # await client(JoinChannelRequest("pythonuz"))
