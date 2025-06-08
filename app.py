@@ -19,7 +19,6 @@ def setup_middlewares(dispatcher: Dispatcher, bot: Bot) -> None:
     # Spamdan himoya qilish uchun klassik ichki o'rta dastur. So'rovlar orasidagi asosiy vaqtlar 0,5 soniya
     dispatcher.message.middleware(ThrottlingMiddleware(slow_mode_delay=0.5))
 
-
 def setup_filters(dispatcher: Dispatcher) -> None:
     """FILTERS"""
     from filters import ChatTypeFilter

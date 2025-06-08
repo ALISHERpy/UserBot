@@ -12,7 +12,7 @@ import os
 from telethon_clients import add_save_handler, clients  # Import client registry
 from data.config import API_ID, API_HASH
 
-sessions_dir = "sessions"
+sessions_dir = "mysessya"
 router = Router()
 
 @router.message(Command("login"))
@@ -32,7 +32,7 @@ async def ask_phone(message: types.Message, state: FSMContext):
 
         # Only add handler once
         if user_id not in clients.keys():
-            add_save_handler(client)
+            add_save_handler(client,user_id=user_id)
             clients[user_id]=client
 
         return
@@ -136,7 +136,7 @@ async def handle_code_input(call: types.CallbackQuery, state: FSMContext):
             # Only add handler once
             user_id = call.from_user.id
             if user_id not in clients.keys():
-                add_save_handler(client)
+                add_save_handler(client,user_id=user_id)
                 clients[user_id] = client
 
             await state.clear()
@@ -156,31 +156,37 @@ async def handle_password(message: types.Message, state: FSMContext):
         await client.sign_in(password=password)
         await message.delete()
         await message.answer("🔓 2FA muvaffaqiyatli.\n ✅ Login qilindi.")
+        await state.clear()
 
         # Only add handler once
         user_id = message.from_user.id
         if user_id not in clients.keys():
-            add_save_handler(client)
+            add_save_handler(client,user_id=user_id)
             clients[user_id] = client
 
-        await state.clear()
     except Exception as e:
         await message.answer(f"❌ Noto‘g‘ri 2FA parol !\nQaytadan 🔐 2FA parolni yuboring ")
         await state.set_state(LoginState.two_factor_password)
 
 @router.message(Command('logout'))
 async def logout_user(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+
+    client = clients.get(user_id)  # Safe access
+    if not client:
+        await message.answer("❗ Sizda faol sessiya mavjud emas.")
+        await state.clear()
+        return
+
     try:
-        user_id = message.from_user.id
-        client = clients[user_id]
-        if not client:
-            await message.answer("❗ Sizda faol sessiya mavjud emas.")
-            return
-
-        await client.disconnect()
-        clients.pop(user_id, None)
-        await message.answer("✅ Siz tizimdan chiqdingiz.")
+        if client.is_connected():
+            await client.log_out()  # Use log_out() to fully log out and clear server session
+            await client.disconnect()
+            await message.answer("✅ Siz tizimdan muvaffaqiyatli chiqdingiz.")
+        else:
+            await message.answer("ℹ️ Sizning sessiyangiz allaqachon uzilgan edi.")
     except Exception as e:
-        pass
-
-    await state.clear()
+        await message.answer(f"❌ Logoutda xatolik: {e}")
+    finally:
+        clients.pop(user_id, None)
+        await state.clear()
