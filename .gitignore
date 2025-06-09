@@ -52,7 +52,6 @@ coverage.xml
 cover/
 
 # Translations
-*.mo
 *.pot
 
 # Django stuff:
@@ -118,7 +117,6 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
-
 # Environments
 .env
 .venv
@@ -160,3 +158,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 data/*.xlsx
+data/*.db
+data.db
+*.db

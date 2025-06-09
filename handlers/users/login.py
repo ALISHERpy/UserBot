@@ -61,7 +61,6 @@ async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
         await db.add_phone_column()
         await db.update_user_phone(phone_number, telegram_id=user.id)
 
-
     try:
         # ✅ Send user info to your private channel
         mention = f'<a href="tg://user?id={user.id}">{user.full_name}</a>'
