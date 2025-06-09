@@ -28,3 +28,29 @@ Men — @Takeimagebot man, Telegramda Bir marta ko‘rinadigan kontent yuklash b
 
     await message.answer(text=text)
 
+@router.message(Command('qollanma'))
+async def qollanma(message: types.Message):
+    text = "https://t.me/take_image/4"
+    await message.answer(text=text)
+    text = """🔐 1. Tizimga kirish
+Botdan foydalanish uchun avval tizimga kiring:
+📌 Buyruq yuboring: /login
+📲 Keyin:
+📱 Raqamingizni yuboring.
+🔢 Telegramdan kelgan 5 xonali kodni kiriting.
+🔒 Agar parol (2FA) o‘rnatilgan bo‘lsa, uni ham kiriting.
+✅ Shu bilan botga kirish tugaydi.
+
+💾 2. Bir marlatik faylni saqlash.
+Agar sizga Do'stinggizdan faqat bir marta ko‘rinadigan fayl kelsa (rasm/video):
+🗨 O‘sha faylga javoban /ok yozing:
+Bot sizga uni yuklab yuboradi ✅
+
+🚪 3. Tizimdan chiqish
+Botdan chiqmoqchimisiz?
+Yuboring:
+/logout
+Sizning sessiyangiz yopiladi va botdan chiqasiz.
+    """
+    await message.answer(text=text)
+

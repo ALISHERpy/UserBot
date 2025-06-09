@@ -50,6 +50,7 @@ async def do_start(message: types.Message):
     msg = (
         "👋 Cheklangan kontent yuklash botiga xush kelibsiz\!\n\n"
         "✳️ Bir marta ko‘rinadigan postlarni saqlash\.\n"
+        "✳️ Batafsil Qollanma uchun /qollanma ni bosing\.\n"
         "✳️ Botdan tashqari \(do‘stdan\) media yuklash uchun media ostiga /ok yozing\.\n"
         "⚠️ Kontent yuklashdan oldin albatta /login bilan tizimga kiring\!\n"
         "✳️ Batafsil ma’lumot uchun /help ni bosing\."
