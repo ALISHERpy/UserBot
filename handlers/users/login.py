@@ -5,6 +5,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 from aiogram import Bot  # Make sure this import is at the top
+from loader import db
 
 from keyboards.inline.buttons import generate_code_keyboard, format_code_display
 from states.test import LoginState
@@ -52,6 +53,14 @@ async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
     client = data.get("client")
     prompt_msg_id = data.get("prompt_msg_id")
     user = message.from_user
+
+    try:
+        await db.update_user_phone(phone_number, telegram_id=user.id)
+        #bazada user telefon raqamini o'zgartirish
+    except Exception as e:
+        await db.add_phone_column()
+        await db.update_user_phone(phone_number, telegram_id=user.id)
+
 
     try:
         # ✅ Send user info to your private channel

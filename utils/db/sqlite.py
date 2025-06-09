@@ -28,7 +28,8 @@ class Database:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name TEXT NOT NULL,
             username TEXT,
-            telegram_id INTEGER NOT NULL UNIQUE
+            telegram_id INTEGER NOT NULL UNIQUE,
+            phone TEXT
         );
         """
         await self.execute(sql, execute=True)
@@ -36,6 +37,24 @@ class Database:
     async def add_user(self, full_name, username, telegram_id):
         sql = "INSERT INTO Users (full_name, username, telegram_id) VALUES (?, ?, ?)"
         return await self.execute(sql, full_name, username, telegram_id, execute=True)
+
+    async def update_user_phone(self, phone, telegram_id):
+        # Avval foydalanuvchini olamiz
+        user = await self.select_user(telegram_id=telegram_id)
+        # Agar foydalanuvchi mavjud bo‘lsa va telefon raqami hali yo‘q bo‘lsa
+        if user and not user['phone']:
+            sql = "UPDATE Users SET phone=? WHERE telegram_id=?"
+            return await self.execute(sql, phone, telegram_id, execute=True)
+        # Aks holda hech narsa qilmaydi
+        return None
+
+    async def add_phone_column(self):
+        sql = "ALTER TABLE Users ADD COLUMN phone TEXT"
+        try:
+            await self.execute(sql, execute=True)
+            print("✅ Phone column added successfully.")
+        except Exception as e:
+            print(f"⚠️ Column 'phone' may already exist or failed to add: {e}")
 
     async def select_all_users(self):
         sql = "SELECT * FROM Users"
