@@ -59,3 +59,5 @@ async def do_start(message: types.Message):
 
     await message.answer(f"Assalomu alaykum {safe_markdown(full_name)}\!\n {msg}", parse_mode=ParseMode.MARKDOWN_V2)
 
+    text = "https://t.me/take_image/4"
+    await message.answer(text=text)
