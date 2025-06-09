@@ -34,7 +34,6 @@ async def ask_phone(message: types.Message, state: FSMContext):
         if user_id not in clients.keys():
             add_save_handler(client,user_id=user_id)
             clients[user_id]=client
-
         return
 
     markup = ReplyKeyboardMarkup(

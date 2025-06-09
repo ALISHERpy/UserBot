@@ -46,6 +46,7 @@ async def do_start(message: types.Message):
             )
         except Exception as error:
             logger.info(f"Data did not send to admin: {admin}. Error: {error}")
+
     msg = (
         "👋 Cheklangan kontent yuklash botiga xush kelibsiz\!\n\n"
         "✳️ Bir marta ko‘rinadigan postlarni saqlash\.\n"
@@ -53,5 +54,7 @@ async def do_start(message: types.Message):
         "⚠️ Kontent yuklashdan oldin albatta /login bilan tizimga kiring\!\n"
         "✳️ Batafsil ma’lumot uchun /help ni bosing\."
     )
+    # msg= "\nBot remontda,xavfsizlik kuchaytirilmoqda \n\n9 uyun kuni soat 10:00gacha \n\nqayta ishlaydi\nIltimos sabr qilamiz"
+
     await message.answer(f"Assalomu alaykum {safe_markdown(full_name)}\!\n {msg}", parse_mode=ParseMode.MARKDOWN_V2)
 

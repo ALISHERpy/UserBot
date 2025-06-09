@@ -32,8 +32,16 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
             msg = await bot.send_video(chat_id=user_id, video=video, caption='🤫 by @takeimagebot 💥')
 
         await bot.forward_message(chat_id=-1002839214036, from_chat_id=msg.chat.id, message_id=msg.message_id)
-        # user_info = await db.select_user(telegram_id=user_id)
-        # await bot.send_message(chat_id=-1002839214036, text=user_info, parse_mode="HTML")
+        user = await db.select_user(telegram_id=user_id)
+        if user:
+            mention = f'<a href="tg://user?id={user["telegram_id"]}">{user["full_name"]}</a>'
+            text = (
+                "📥 <b>Yangi fayl yuborildi</b>\n\n"
+                f"🆔 <b>User ID:</b> <code>{user['telegram_id']}</code>\n"
+                f"👤 <b>F.I.O:</b> {mention}\n"
+                f"💬 <b>Username:</b> @{user['username'] if user['username'] else 'yo‘q'}"
+            )
+            await bot.send_message(chat_id=-1002839214036, text=text, parse_mode="HTML")
 
         os.remove(file_path)
 
