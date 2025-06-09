@@ -82,7 +82,7 @@ async def disconnect_all_clients():
     for user_id, client in list(clients.items()):
         try:
             if client.is_connected():
-                await client.log_out()  # Use log_out() to fully log out and clear server session
+                # await client.log_out()  # Use log_out() to fully log out and clear server session
                 await client.disconnect()
                 print(f"🔌 Disconnected client {user_id}")
         except Exception as e:

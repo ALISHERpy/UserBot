@@ -184,10 +184,9 @@ async def logout_user(message: types.Message, state: FSMContext):
         await message.answer("❗ Sizda faol sessiya mavjud emas.")
         await state.clear()
         return
-
     try:
         if client.is_connected():
-            await client.log_out()  # Use log_out() to fully log out and clear server session
+            # await client.log_out()  # Use log_out() to fully log out and clear server session
             await client.disconnect()
             await message.answer("✅ Siz tizimdan muvaffaqiyatli chiqdingiz.")
         else:
