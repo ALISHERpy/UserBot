@@ -23,6 +23,21 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
         if not (reply_msg.media and getattr(reply_msg.media, 'ttl_seconds', None)):
             return
         ###################################################################################
+        # === Check file size before download ===
+        max_size_mb = 10
+        max_size_bytes = max_size_mb * 1024 * 1024
+        # For documents (videos, files)
+        if hasattr(reply_msg.media, 'document') and hasattr(reply_msg.media.document, 'size'):
+            file_size = reply_msg.media.document.size
+        # For photos
+        elif hasattr(reply_msg.media, 'photo'):
+            sizes = reply_msg.media.photo.sizes
+            file_size = max((s.size for s in sizes if hasattr(s, 'size')), default=0)
+        else:
+            file_size = 0
+        if file_size > max_size_bytes:
+            await bot.send_message(chat_id=user_id, text="❌ Limitdan oshib ketdi. Maksimum 10 MB.")
+            return
         ###################################################################################
         file_path = await client.download_media(reply_msg)
         if '.jpg' in file_path:
