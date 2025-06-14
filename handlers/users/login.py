@@ -10,7 +10,7 @@ from loader import db
 from keyboards.inline.buttons import generate_code_keyboard, format_code_display
 from states.test import LoginState
 import os
-from telethon_clients import add_save_handler, clients  # Import client registry
+from telethon_clients import add_save_handler, clients, disconnect_all_clients  # Import client registry
 from data.config import API_ID, API_HASH
 
 sessions_dir = "mysessya"
@@ -22,6 +22,10 @@ async def ask_phone(message: types.Message, state: FSMContext):
     if user_id in clients.keys() and clients[user_id].is_connected():
         await message.answer("✅ Siz avval tizimga kirgansiz. Session aktiv.")
         return
+
+    if len(clients) > 50:
+        print("⚠️ Too many clients, disconnecting all to keep server light.")
+        await disconnect_all_clients()
 
     session_path = os.path.join(sessions_dir, f"{user_id}.session")
     client = TelegramClient(session_path, API_ID, API_HASH)
