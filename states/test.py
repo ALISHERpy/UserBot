@@ -18,3 +18,11 @@ class LoginState(StatesGroup):
 
 class ClientState(StatesGroup):
     waiting_delete_confirm = State()
+
+
+class GetHistory(StatesGroup):
+    waiting_ids = State()
+
+
+class ConfirmCommand(StatesGroup):
+    waiting_code = State()
