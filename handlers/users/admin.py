@@ -73,12 +73,13 @@ async def send_ad_to_users(message: types.Message, state: FSMContext):
     users = await db.select_all_users()
     count = 0
     for user in users:
-        user_id = user[-2]
         try:
+            user_id = user[-2]
             await message.send_copy(chat_id=user_id)
             count += 1
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.1)
         except Exception as error:
+            pass
             logging.info(f"Ad did not send to user: {user_id}. Error: {error}")
     await message.answer(text=f"Reklama {count} ta foydalauvchiga muvaffaqiyatli yuborildi.")
     await state.clear()
