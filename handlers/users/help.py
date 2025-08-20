@@ -30,8 +30,8 @@ Men — @Takeimagebot man, Telegramda Bir marta ko‘rinadigan kontent yuklash b
 
 @router.message(Command('qollanma'))
 async def qollanma(message: types.Message):
-    text = "https://t.me/take_image/4"
-    await message.answer(text=text)
+    # text = "https://t.me/take_image/4"
+    # await message.answer(text=text)
     text = """🔐 1. Tizimga kirish
 Botdan foydalanish uchun avval tizimga kiring:
 📌 Buyruq yuboring: /login
@@ -51,6 +51,8 @@ Botdan chiqmoqchimisiz?
 Yuboring:
 /logout
 Sizning sessiyangiz yopiladi va botdan chiqasiz.
+
+✋Bazan /ok command ishlamaydi,siz botga qayta kelib /login commandini yuboring va hammasi qaytadan ishga tushadi.
     """
     await message.answer(text=text)
     text="""
