@@ -53,4 +53,15 @@ Yuboring:
 Sizning sessiyangiz yopiladi va botdan chiqasiz.
     """
     await message.answer(text=text)
+    text="""
+    ⚠️ DIQQAT!
+Quyidagi holatlarda botdan foydalanmang:
 
+☎️ Agar sizning Telegram raqamingiz noaktiv bo‘lsa (ya’ni, SIM-kartangiz hozir sizda bo‘lmasa, eski raqam bo‘lsa).
+
+🌍 Agar siz chet el raqamiga ochilgan Telegram hisobidan foydalansangiz.
+
+❓ Nega?
+Bu Telegram’ning rasmiy xavfsizlik siyosatiga bog‘liq. Yuqoridagi 2 turdagi akkauntlar bilan ishlaganda ba’zi texnik muammolar yuzaga kelishi mumkin, bu esa botimizning to‘liq ishlashiga xalaqit beradi.
+👨‍🦳Admin : @take_image"""
+    await message.answer(text=text)
