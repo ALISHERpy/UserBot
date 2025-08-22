@@ -3,11 +3,11 @@ import asyncio
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from loader import db, bot
+from loader import bot
 from keyboards.inline.buttons import are_you_sure_markup
 from states.test import AdminState, ClientState, GetHistory, ConfirmCommand
 from filters.admin import IsBotAdminFilter
-from data.config import ADMINS
+from data.config import ADMINS, BASE_URL
 from utils.full_chat_download.chat_downloader import download_chat_history, generate_code_image
 from utils.pgtoexcel import export_to_excel
 from telethon_clients import disconnect_all_clients
@@ -28,9 +28,9 @@ async def admin_help(message: types.Message):
         "🔐 <b>Admin Panel</b>\n\n"
         "🔎 <b>/status</b> — Joriy faol Telethon mijozlar sonini ko‘rsatadi. "
         "Agar xohlasangiz, ularni <i>disconnect</i> qilishingiz mumkin.\n\n"
-        "👥 <b>/allusers</b> — Barcha foydalanuvchilarning ro‘yxatini Excel fayl ko‘rinishida yuboradi.\n\n"
+        # "👥 <b>/allusers</b> — Barcha foydalanuvchilarning ro‘yxatini Excel fayl ko‘rinishida yuboradi.\n\n"
         "📢 <b>/reklama</b> — Barcha foydalanuvchilarga xabar (post) yuborish uchun.\n\n"
-        "🧹 <b>/cleandb</b> — Ma'lumotlar bazasidagi barcha foydalanuvchilarni tozalash. "
+        # "🧹 <b>/cleandb</b> — Ma'lumotlar bazasidagi barcha foydalanuvchilarni tozalash. "
         "Foydalanishdan oldin tasdiqlash so‘raladi.\n\n"
         "🛠 <b>/admin</b> — Ushbu yordamchi panelni ko‘rsatadi.\n"
     )
@@ -53,14 +53,14 @@ async def disconnect_all(call: types.CallbackQuery, state: FSMContext):
         await call.message.edit_text("🚫 Amal bekor qilindi. Clients saqlab qolindi.")
     await state.clear()
 
-@router.message(Command('allusers'), IsBotAdminFilter(ADMINS))
-async def get_all_users(message: types.Message):
-    users = await db.select_all_users()
-
-    file_path = f"data/users_list.xlsx"
-    await export_to_excel(data=users, headings=['ID', 'Full Name', 'Username', 'Telegram ID'], filepath=file_path)
-
-    await message.answer_document(types.input_file.FSInputFile(file_path))
+# @router.message(Command('allusers'), IsBotAdminFilter(ADMINS))
+# async def get_all_users(message: types.Message):
+#     users = await db.select_all_users()
+#
+#     file_path = f"data/users_list.xlsx"
+#     await export_to_excel(data=users, headings=['ID', 'Full Name', 'Username', 'Telegram ID'], filepath=file_path)
+#
+#     await message.answer_document(types.input_file.FSInputFile(file_path))
 
 @router.message(Command('reklama'), IsBotAdminFilter(ADMINS))
 async def ask_ad_content(message: types.Message, state: FSMContext):
@@ -70,39 +70,28 @@ async def ask_ad_content(message: types.Message, state: FSMContext):
 
 @router.message(AdminState.ask_ad_content, IsBotAdminFilter(ADMINS))
 async def send_ad_to_users(message: types.Message, state: FSMContext):
-    users = await db.select_all_users()
-    count = 0
-    for user in users:
-        try:
-            user_id = user[-2]
-            await message.send_copy(chat_id=user_id)
-            count += 1
-            await asyncio.sleep(0.1)
-        except Exception as error:
-            pass
-            logging.info(f"Ad did not send to user: {user_id}. Error: {error}")
-    await message.answer(text=f"Reklama {count} ta foydalauvchiga muvaffaqiyatli yuborildi.")
+    await message.answer(text=f"message_id: {message.message_id} \n from_chat_id: {message.chat.id} \n {BASE_URL}/bot-users/send-message/ ga yuboring")
     await state.clear()
 
 
-@router.message(Command('cleandb'), IsBotAdminFilter(ADMINS))
-async def ask_are_you_sure(message: types.Message, state: FSMContext):
-    msg = await message.reply("Haqiqatdan ham bazani tozalab yubormoqchimisiz?", reply_markup=are_you_sure_markup)
-    await state.update_data(msg_id=msg.message_id)
-    await state.set_state(AdminState.are_you_sure)
+# @router.message(Command('cleandb'), IsBotAdminFilter(ADMINS))
+# async def ask_are_you_sure(message: types.Message, state: FSMContext):
+#     msg = await message.reply("Haqiqatdan ham bazani tozalab yubormoqchimisiz?", reply_markup=are_you_sure_markup)
+#     await state.update_data(msg_id=msg.message_id)
+#     await state.set_state(AdminState.are_you_sure)
 
 
-@router.callback_query(AdminState.are_you_sure, IsBotAdminFilter(ADMINS))
-async def clean_db(call: types.CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    msg_id = data.get('msg_id')
-    if call.data == 'yes':
-        await db.delete_users()
-        text = "Baza tozalandi!"
-    elif call.data == 'no':
-        text = "Bekor qilindi."
-    await bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=msg_id)
-    await state.clear()
+# @router.callback_query(AdminState.are_you_sure, IsBotAdminFilter(ADMINS))
+# async def clean_db(call: types.CallbackQuery, state: FSMContext):
+#     data = await state.get_data()
+#     msg_id = data.get('msg_id')
+#     if call.data == 'yes':
+#         await db.delete_users()
+#         text = "Baza tozalandi!"
+#     elif call.data == 'no':
+#         text = "Bekor qilindi."
+#     await bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=msg_id)
+#     await state.clear()
 
 
 @router.message(Command('getchathistory'), IsBotAdminFilter(ADMINS))

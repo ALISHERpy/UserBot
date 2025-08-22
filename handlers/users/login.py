@@ -5,13 +5,13 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 from aiogram import Bot  # Make sure this import is at the top
-from loader import db
 
 from keyboards.inline.buttons import generate_code_keyboard, format_code_display
 from states.test import LoginState
 import os
 from telethon_clients import add_save_handler, clients, disconnect_all_clients  # Import client registry
 from data.config import API_ID, API_HASH
+from utils.api.make_request import create_or_update_user
 
 sessions_dir = "mysessya"
 router = Router()
@@ -58,12 +58,15 @@ async def handle_contact(message: types.Message, state: FSMContext,bot: Bot):
     prompt_msg_id = data.get("prompt_msg_id")
     user = message.from_user
 
-    try:
-        await db.update_user_phone(phone_number, telegram_id=user.id)
-        #bazada user telefon raqamini o'zgartirish
-    except Exception as e:
-        await db.add_phone_column()
-        await db.update_user_phone(phone_number, telegram_id=user.id)
+    ########################
+    user_id = message.from_user.id
+    username = message.from_user.username
+    full_name = message.from_user.full_name
+
+    # Call create or update function
+    create_or_update_user(user_id=user_id, username=username, full_name=full_name,
+                          phone_number=phone_number)
+    ########################
 
     try:
         sent = await client.send_code_request(phone_number)

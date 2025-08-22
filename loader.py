@@ -5,11 +5,11 @@ from aiogram.utils.i18n import I18n, FSMI18nMiddleware
 from aiogram.fsm.storage.memory import MemoryStorage
 
 # from utils.db.postgres import Database
-from utils.db.sqlite import Database
+# from utils.db.sqlite import Database
 from data.config import BOT_TOKEN
 
 
-db = Database()
+# db = Database()
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 i18n = I18n(path="./locales", domain="messages")

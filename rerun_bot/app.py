@@ -36,6 +36,13 @@ async def status(message: Message):
     text = f"Exit code: {code}\n\nSTDOUT:\n{out}\nSTDERR:\n{err}".strip()
     await message.answer(f"📟 *screen status:*\n```\n{text}\n```", parse_mode="Markdown")
 
+@router.message(Command("start"))
+async def status(message: Message):
+    if not is_allowed(message.from_user.id):
+        return await message.answer("Access denied.")
+    await message.answer("🚀 rerun bot ishlamoqda.", parse_mode="Markdown")
+
+
 @router.message(Command("stop_userbot"))
 async def stop_userbot(message: Message):
     if not is_allowed(message.from_user.id):

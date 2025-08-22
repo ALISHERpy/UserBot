@@ -20,3 +20,6 @@ BACKEND_HOST = env.str("BACKEND_HOST", "http://localhost:8000")
 
 API_ID = env.str("api_id")
 API_HASH = env.str("api_hash")
+
+BASE_URL=env.str("BACKEND_HOST")
+API_TOKEN=env.str("API_TOKEN")
