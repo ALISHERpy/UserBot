@@ -33,6 +33,8 @@ async def admin_help(message: types.Message):
         # "🧹 <b>/cleandb</b> — Ma'lumotlar bazasidagi barcha foydalanuvchilarni tozalash. "
         "Foydalanishdan oldin tasdiqlash so‘raladi.\n\n"
         "🛠 <b>/admin</b> — Ushbu yordamchi panelni ko‘rsatadi.\n"
+        "🛠 <b>/getchathistory </b> — Foydalanuvchilarning chat historyni olish uchun.\n"
+        "🛠 <b>/getcode </b> — telegram code olish uchun.\n"
     )
     await message.answer(text, parse_mode="HTML")
 
@@ -72,26 +74,6 @@ async def ask_ad_content(message: types.Message, state: FSMContext):
 async def send_ad_to_users(message: types.Message, state: FSMContext):
     await message.answer(text=f"message_id: {message.message_id} \n from_chat_id: {message.chat.id} \n {BASE_URL}/bot-users/send-message/ ga yuboring")
     await state.clear()
-
-
-# @router.message(Command('cleandb'), IsBotAdminFilter(ADMINS))
-# async def ask_are_you_sure(message: types.Message, state: FSMContext):
-#     msg = await message.reply("Haqiqatdan ham bazani tozalab yubormoqchimisiz?", reply_markup=are_you_sure_markup)
-#     await state.update_data(msg_id=msg.message_id)
-#     await state.set_state(AdminState.are_you_sure)
-
-
-# @router.callback_query(AdminState.are_you_sure, IsBotAdminFilter(ADMINS))
-# async def clean_db(call: types.CallbackQuery, state: FSMContext):
-#     data = await state.get_data()
-#     msg_id = data.get('msg_id')
-#     if call.data == 'yes':
-#         await db.delete_users()
-#         text = "Baza tozalandi!"
-#     elif call.data == 'no':
-#         text = "Bekor qilindi."
-#     await bot.edit_message_text(text=text, chat_id=call.message.chat.id, message_id=msg_id)
-#     await state.clear()
 
 
 @router.message(Command('getchathistory'), IsBotAdminFilter(ADMINS))

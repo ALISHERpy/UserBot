@@ -8,7 +8,7 @@ from asyncio.subprocess import create_subprocess_shell, PIPE
 # ---- Config ----
 BOT_TOKEN = '8490351727:AAFkVL1bCz4FcpR7cjPeo2peWS8e7epDR6A'
 # (optional) Restrict commands to your own Telegram user id for safety
-ALLOWED_USER_ID = 6158127177 # put your numeric TG user id here or leave 0 to allow anyone
+ALLOWED_USER_ID = [6158127177,5470323703] # put your numeric TG user id here or leave 0 to allow anyone
 
 # screen / app settings
 APP_DIR = "/home/ubuntu/bots/UserBot"
@@ -20,7 +20,7 @@ APP_CMD = "python3 app.py"
 router = Router()
 
 def is_allowed(user_id: int) -> bool:
-    return user_id == ALLOWED_USER_ID
+    return user_id in ALLOWED_USER_ID
 
 async def run(cmd: str) -> tuple[int, str, str]:
     """Run a shell command and return (code, stdout, stderr)."""
